@@ -10,7 +10,7 @@ let urlDatabase = {};
 let shortUrlCounter = 1;
 
 // Middleware para parsear el body
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
@@ -23,16 +23,16 @@ app.get('/', function(req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-app.get('/api/hello', function(req, res) {
-  res.json({ greeting: 'hello API' });
-});
-
 app.post('/api/shorturl', function(req, res) {
   const originalUrl = req.body.url;
+  const urlPattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
 
-  try {
-    new URL(originalUrl); // Intenta crear un objeto URL. Si falla, la URL no es válida.
-  } catch (error) {
+  if (!urlPattern.test(originalUrl)) {
     return res.json({ error: 'invalid url' });
   }
 
