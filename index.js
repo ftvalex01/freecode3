@@ -23,10 +23,14 @@ app.get('/', (req, res) => {
 
 app.post('/api/shorturl', (req, res) => {
   const { url: originalUrl } = req.body;
-  if (!validator.isURL(originalUrl, { require_protocol: true })) {
+/*   if (!validator.isURL(originalUrl, { require_protocol: true })) {
     return res.status(400).json({ error: 'invalid URL' });
+  } */
+  if (!urlPattern.test(originalUrl)) {
+    return res.json({ error: 'invalid url' });
   }
 
+  // Si la URL es válida, sigue con la creación de la URL corta.
   const shortUrl = shortUrlCounter++;
   urlDatabase[shortUrl] = originalUrl;
   res.json({ original_url: originalUrl, short_url: shortUrl });
